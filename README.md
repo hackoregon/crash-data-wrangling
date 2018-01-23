@@ -25,7 +25,7 @@
 3. On the "Options" tab, press the "+" to add an option row.
 4. In the blank row, set the "Options" field to "datasource". Set the "Value" field to "ODBC:odot_crash_data_dsn". Then press "Save".
 
-### Importing the data
+### Importing the schema
 1. Right-click on the "odot_crash_data" database and open the Query Tool.
 2. Paste the following code in the query editor
 
@@ -35,7 +35,9 @@
     FROM SERVER odot_crash_data_server INTO odot_crash_data_schema;
     ```
 3. Run the query by pressing the lightning bolt button above the query editor. The import will proceed.
-4. When the query finishes, right-click on "Schemas" and refresh. Then go down the tree to "Foreign Tables" and you'll see the imported data!
+4. When the query finishes, right-click on "Schemas" and refresh. Then go down the tree to "Foreign Tables" and you'll see the imported schema!
+
+### Importing the data
 
 ### Saving the database.
 1. Right-click on the "odot_crash_data" database and select "Backup".
