@@ -4,44 +4,36 @@
 1. Windows: 64-bit. Windows 7 or later should work, but I only test on Windows 10 Pro.
 2. PostgreSQL 10 and PostGIS 2.4: Use the 64-bit EnterpriseDB installer from <https://www.enterprisedb.com/downloads/postgres-postgresql-downloads#windows>. Make sure you install both PostgreSQL and PostGIS. Earlier versions may not work.
 3.  Microsoft Access Database Engine 2016 Redistributable from  <https://www.microsoft.com/en-us/download/details.aspx?id=54920>. Again, you need the 64-bit version.
+4. R and library packages `magrittr`, `DBI` and `odbc`.
 
-## Creating an ODBC data set name (DSN)
-1. Open the ODBC Data Sources 64-bit app.
-2. Select the "System DSN" tab.
-3. Press the "Add" button. Select the Microsoft Access driver. Press "Finish".
-4. Set the Data Source Name to "odot_crash_data_dsn". Press the "Select" button and browse to the Access database ".mdb" file. Press "OK".
-5. Press "OK".
+## Creating the destination PostgreSQL database
+1. Open PgAdmin4.
+2. Connect to PostgreSQL.
+3. Right-click on "Databases" and select "Create". Call the new database "odot_crash_data".
+4. Open the ODBC Data Sources 64-bit app.
+5. Select the "System DSN" tab.
+6. Press the "Add" button. Select the PostgreSQL ODBC Driver(Unicode) driver. Press "Finish". Fill in the form:
+    * Data Source = "odot_crash_data_postgresql".
+    * Database = "odot_crash_data".
+    * Server = "localhost"
+    * Port = 5432.
+    * Username = "postgres".
+    * Password = the password you set for the "postgres" user when you installed PostgreSQL.
+7. Press "Test". If the connection is successful, you're done. Otherwise, you probably mistyped something. Once the test passes, press "Save". Leave the app open.
 
-## PgAdmin4 operations
+## Creating the source Access file data source name
+1. Press the "Add" button. Select the Microsoft Access driver. Press "Finish".
+2. Set the Data Source Name to "odot_crash_data_access". Press the "Select" button and browse to the Access database ".mdb" file. Press "OK".
+3. Press "OK".
+4. Close the app.
 
-### Creating the database
-1. Start PgAdmin4 and connect to PostgreSQL as the "postgres" user.
-2. Create a database called "odot_crash_data".
-3. In the database, create the "ogr_fdw" extension.
+## Running the R script
+There are a number of ways you can run the R script, including with RStudio. The easiest way is to start the R GUI from the "Start" menu, open the script and run it with the menu. The script is called "copy_odot_crash_database.R".
 
-### Creating the foreign data server
-1. Open the "Foreign Data Wrappers -> ogr_fdw" tree. You'll see "Foreign Servers". Right-click on "Foreign Servers" and select "Create".
-2. Set the name to "odot_crash_data_server".
-3. On the "Options" tab, press the "+" to add an option row.
-4. In the blank row, set the "Options" field to "datasource". Set the "Value" field to "ODBC:odot_crash_data_dsn". Then press "Save".
-
-### Importing the schema
-1. Right-click on the "odot_crash_data" database and open the Query Tool.
-2. Paste the following code in the query editor
-
-    ```
-    CREATE SCHEMA IF NOT EXISTS odot_crash_data_schema;
-    IMPORT FOREIGN SCHEMA ogr_all 
-    FROM SERVER odot_crash_data_server INTO odot_crash_data_schema;
-    ```
-3. Run the query by pressing the lightning bolt button above the query editor. The import will proceed.
-4. When the query finishes, right-click on "Schemas" and refresh. Then go down the tree to "Foreign Tables" and you'll see the imported schema!
-
-### Importing the data
-
-### Saving the database.
+## Saving the database.
 1. Right-click on the "odot_crash_data" database and select "Backup".
-2. In the panel that opens up, press the "..." button to the right of the "Filename" field. This will open a browser for you to define a file. Use the "sql" format. Press "Create" to close the dialog. Then press "Backup".
-3. When the backup is complete, close PgAdmin4.
-
-## Restoring to another system1. 
+2. In the panel that opens up, press the "..." button to the right of the "Filename" field. This will open a browser for you to define a file. Use the "sql" format. Set the file name to "odot_crash_data.sql". Press "Create" to close the dialog. 
+3. Select the "Plain" entry in the "Format" drop-down. This sets the output format to a plain-text set of SQL operations to re-create the database.
+4. Go to the "Dump qptions" tab. In the "Queries" section, set both "Include CREATE DATABASE statement" and "Include DROP DATABASE statement" to "Yes".
+Then press "Backup".
+5. When the backup is complete, close PgAdmin4. The resulting file is about 74 megabytes.
