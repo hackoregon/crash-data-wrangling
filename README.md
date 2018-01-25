@@ -34,6 +34,5 @@ There are a number of ways you can run the R script, including with RStudio. The
 1. Right-click on the "odot_crash_data" database and select "Backup".
 2. In the panel that opens up, press the "..." button to the right of the "Filename" field. This will open a browser for you to define a file. Use the "sql" format. Set the file name to "odot_crash_data.sql". Press "Create" to close the dialog. 
 3. Select the "Plain" entry in the "Format" drop-down. This sets the output format to a plain-text set of SQL operations to re-create the database.
-4. Go to the "Dump qptions" tab. In the "Queries" section, set both "Include CREATE DATABASE statement" and "Include DROP DATABASE statement" to "Yes".
 Then press "Backup".
-5. When the backup is complete, close PgAdmin4. The resulting file is about 74 megabytes.
+4. When the backup is complete, close PgAdmin4. The resulting file is about 74 megabytes.
