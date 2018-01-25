@@ -1,0 +1,11 @@
+version: '3.4'
+services:
+    odot-crash-data:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        environment:
+            - POSTGRES_PASSWORD=$PGPASSWORD
+        image: docker.io/znmeb/odot-crash-data
+        ports: 
+        - '5438:5432'
