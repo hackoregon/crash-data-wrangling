@@ -4,8 +4,8 @@ services:
         build:
             context: .
             dockerfile: Dockerfile
-        environment:
-            - POSTGRES_PASSWORD=$PGPASSWORD
+        env_file:
+            - odot_crash_data.env
         image: docker.io/znmeb/odot-crash-data
         ports: 
-        - '5438:5432'
+        - '5439:5432'
