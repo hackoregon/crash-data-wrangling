@@ -31,8 +31,9 @@ conn <- postgresql_connection("postgis", "odot_crash_data", postgres_password)
 # get list of tables from MDB file
 tables <- get_tables("odot_crash_data.mdb")
 for (table_name in tables) {
+  cat("\nMigrating table", table_name, "\n")
   work <- get_table("odot_crash_data.mdb", table_name)
-  DBI::dbWriteTable(conn, tolower(table_name), work)
+  DBI::dbWriteTable(conn, tolower(table_name), work, overwrite = TRUE)
 }
 
 # disconnect
