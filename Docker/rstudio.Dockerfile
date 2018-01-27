@@ -18,6 +18,7 @@ RUN apt-get update \
   && apt-get install -qqy --no-install-recommends \
   mdbtools \
   libpq-dev \
+  postgresql-client-10 \
   && apt-get clean
 
 # update the databases
@@ -27,3 +28,8 @@ RUN updatedb
 
 # R packages we need
 RUN R --no-save --no-restore -e "install.packages(c('Hmisc', 'RPostgres'))"
+
+# Populate /home/rstudio
+COPY migrate.R /home/rstudio
+COPY odot_crash_data.mdb /home/rstudio/
+RUN chown -R rstudio:rstudio /home/rstudio
