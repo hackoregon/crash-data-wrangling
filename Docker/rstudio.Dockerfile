@@ -27,7 +27,7 @@ RUN apt-file update
 RUN updatedb
 
 # R packages we need
-RUN R --no-save --no-restore -e "install.packages(c('Hmisc', 'RPostgres'))"
+RUN R --no-save --no-restore -e "install.packages(c('Hmisc', 'RPostgres'), quiet = TRUE)"
 
 # Populate /home/rstudio
 COPY migrate.R /home/rstudio
