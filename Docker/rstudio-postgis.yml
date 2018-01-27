@@ -5,6 +5,8 @@ services:
       context: .
       dockerfile: rstudio.Dockerfile
     image: docker.io/znmeb/rstudio
+    env_file:
+      - odot_crash_data.env
     ports:
       - 8787:8787
   postgis:
