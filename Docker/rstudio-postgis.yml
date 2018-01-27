@@ -5,13 +5,13 @@ services:
       context: .
       dockerfile: rstudio.Dockerfile
     image: docker.io/znmeb/rstudio
-    env:
+    environment:
       - POSTGRES_PASSWORD
     ports:
       - 8787:8787
   postgis:
     image: docker.io/znmeb/postgis
-    env:
+    environment:
       - POSTGRES_PASSWORD
     ports: 
       - 5439:5432

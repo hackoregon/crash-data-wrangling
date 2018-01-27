@@ -32,4 +32,5 @@ RUN R --no-save --no-restore -e "install.packages(c('Hmisc', 'RPostgres'), quiet
 # Populate /home/rstudio
 COPY migrate.R /home/rstudio
 COPY odot_crash_data.mdb /home/rstudio/
+RUN echo $POSTGRES_PASSWORD > /home/rstudio/POSTGRES_PASSWORD.txt
 RUN chown -R rstudio:rstudio /home/rstudio
