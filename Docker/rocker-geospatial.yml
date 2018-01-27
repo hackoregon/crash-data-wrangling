@@ -1,0 +1,6 @@
+version: '3.4'
+services:
+  geospatial:
+    image: docker.io/rocker/geospatial
+    ports:
+      - 8787:8787
