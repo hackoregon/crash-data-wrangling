@@ -1,5 +1,5 @@
 FROM docker.io/rocker/rstudio
-MAINTAINER M. Edward (Ed) Borasky <znmeb@znmeb.net>
+LABEL maintainer="M. Edward (Ed) Borasky <znmeb@znmeb.net>"
 
 # command line / development conveniences
 RUN apt-get update \
