@@ -3,7 +3,7 @@ services:
   rstudio:
     build:
       context: .
-      dockerfile: rstudio.Dockerfile
+      dockerfile: Dockerfile
     image: docker.io/znmeb/rstudio
     environment:
       - POSTGRES_PASSWORD
