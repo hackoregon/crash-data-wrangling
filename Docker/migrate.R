@@ -1,3 +1,12 @@
+# Set environment variables
+Sys.setenv(
+  PGHOST = "postgis",
+  PGPORT = 5432,
+  PGUSER = "postgres",
+  PGPASSWORD = postgres_password
+)
+
+# define functions
 get_tables <- function(mdb_file) {
   tables <- Hmisc::mdb.get(mdb_file, tables = TRUE)
   return(grep(pattern = "^tbl", x = tables, invert = TRUE, value = TRUE))
@@ -9,32 +18,31 @@ get_table <- function(mdb_file, table_name) {
   return(work)
 }
 
-postgresql_connection <- function(service_name, dbname, password) {
+get_postgresql_connection <- function(dbname) {
   return(DBI::dbConnect(
     drv = RPostgres::Postgres(),
-    host = service_name,
-    port = 5432,
-    user = "postgres",
-    dbname = dbname,
-    password = password
+    dbname = dbname
   ))
 }
 
 # connect to destination PostgreSQL server and create a database
-conn <- postgresql_connection("postgis", "postgres", postgres_password)
-DBI::dbSendStatement(conn, "CREATE DATABASE odot_crash_data;")
-DBI::dbDisconnect(conn)
+pgcon <- get_postgresql_connection("postgres")
+DBI::dbSendStatement(pgcon, "CREATE DATABASE odot_crash_data;")
+DBI::dbDisconnect(pgcon)
 
 # reconnect to the new database
-conn <- postgresql_connection("postgis", "odot_crash_data", postgres_password)
+pgcon <- get_postgresql_connection("odot_crash_data")
 
 # get list of tables from MDB file
 tables <- get_tables("odot_crash_data.mdb")
 for (table_name in tables) {
   cat("\nMigrating table", table_name, "\n")
   work <- get_table("odot_crash_data.mdb", table_name)
-  DBI::dbWriteTable(conn, tolower(table_name), work, overwrite = TRUE)
+  DBI::dbWriteTable(pgcon, tolower(table_name), work, overwrite = TRUE)
 }
 
 # disconnect
-DBI::dbDisconnect(conn)
+DBI::dbDisconnect(pgcon)
+
+# dump to SQL text
+system("pg_dump --dbname=odot_crash_data > odot_crash_data.sql")
