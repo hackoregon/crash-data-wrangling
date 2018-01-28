@@ -7,7 +7,7 @@
 
 ## Running the migration
 1. Type `docker-compose up -d`.
-2. Browse to localhost:8787 and sign in as `rstudio`, password `rstudio`. (Yes, this can be changed.)
+2. Browse to localhost:7878 and sign in as `rstudio`, password `rstudio`. (Yes, this can be changed.)
 3. Open the file `migrate.R` and "source" it. (Yes, this can be automated.)
 4. In the `Files` pane, fill in the checkmark next to `odot_crash_data.sql`. Then select `Export` in the `More` dropdown. You'll get a file save dialog. This is the plain-text dump of the `odot_crash_data` database. (Yes, this can be automated too.)
 
