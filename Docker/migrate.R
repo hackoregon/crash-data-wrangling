@@ -30,6 +30,7 @@ get_postgresql_connection <- function(dbname) {
 
 # connect to destination PostgreSQL server and create a database
 pgcon <- get_postgresql_connection("postgres")
+DBI::dbSendStatement(pgcon, "DROP DATABASE IF EXISTS odot_crash_data;")
 DBI::dbSendStatement(pgcon, "CREATE DATABASE odot_crash_data;")
 DBI::dbDisconnect(pgcon)
 
