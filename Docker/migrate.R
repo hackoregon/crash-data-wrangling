@@ -1,3 +1,6 @@
+# read password for "postgres" database user
+postgres_password <- readLines("POSTGRES_PASSWORD.txt")
+
 # Set environment variables
 Sys.setenv(
   PGHOST = "postgis",
@@ -7,12 +10,12 @@ Sys.setenv(
 )
 
 # define functions
-get_tables <- function(mdb_file) {
+get_mdb_tables <- function(mdb_file) {
   tables <- Hmisc::mdb.get(mdb_file, tables = TRUE)
   return(grep(pattern = "^tbl", x = tables, invert = TRUE, value = TRUE))
 }
 
-get_table <- function(mdb_file, table_name) {
+get_mdb_table <- function(mdb_file, table_name) {
   work <- Hmisc::mdb.get(mdb_file, tables = table_name, allow = "_")
   colnames(work) <- tolower(colnames(work))
   return(work)
@@ -34,10 +37,10 @@ DBI::dbDisconnect(pgcon)
 pgcon <- get_postgresql_connection("odot_crash_data")
 
 # get list of tables from MDB file
-tables <- get_tables("odot_crash_data.mdb")
+tables <- get_mdb_tables("odot_crash_data.mdb")
 for (table_name in tables) {
   cat("\nMigrating table", table_name, "\n")
-  work <- get_table("odot_crash_data.mdb", table_name)
+  work <- get_mdb_table("odot_crash_data.mdb", table_name)
   DBI::dbWriteTable(pgcon, tolower(table_name), work, overwrite = TRUE)
 }
 
