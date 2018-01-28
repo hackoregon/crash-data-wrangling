@@ -1,6 +1,9 @@
 FROM docker.io/rocker/rstudio
 LABEL maintainer="M. Edward (Ed) Borasky <znmeb@znmeb.net>"
 
+# pick up "postgres" user's password for the "postgis" service
+ARG POSTGRES_PASSWORD
+
 # command line / development conveniences
 RUN apt-get update \
   && apt-get install -qqy --no-install-recommends \
@@ -32,5 +35,5 @@ RUN R --no-save --no-restore -e "install.packages(c('Hmisc', 'RPostgres'), quiet
 # Populate /home/rstudio
 COPY migrate.R /home/rstudio
 COPY odot_crash_data.mdb /home/rstudio/
-RUN echo $POSTGRES_PASSWORD > /home/rstudio/POSTGRES_PASSWORD.txt
+RUN echo ${POSTGRES_PASSWORD} > /home/rstudio/POSTGRES_PASSWORD.txt
 RUN chown -R rstudio:rstudio /home/rstudio

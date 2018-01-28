@@ -4,9 +4,9 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        - POSTGRES_PASSWORD
     image: docker.io/znmeb/rstudio
-    environment:
-      - POSTGRES_PASSWORD
     ports:
       - 8787:8787
   postgis:
