@@ -47,8 +47,27 @@ for (table_name in tables) {
   DBI::dbWriteTable(pgcon, tolower(table_name), work, overwrite = TRUE)
 }
 
+# add primary keys
+dummy <- DBI::dbSendStatement(
+  pgcon,
+  "ALTER TABLE public.crash ADD CONSTRAINT crash_pkey PRIMARY KEY (crash_id);"
+)
+DBI::dbClearResult(dummy)
+
+dummy <- DBI::dbSendStatement(
+  pgcon,
+  "ALTER TABLE public.partic ADD CONSTRAINT partic_pkey PRIMARY KEY (partic_id);"
+)
+DBI::dbClearResult(dummy)
+
+dummy <- DBI::dbSendStatement(
+  pgcon,
+  "ALTER TABLE public.vhcl ADD CONSTRAINT vhcl_pkey PRIMARY KEY (vhcl_id);"
+)
+DBI::dbClearResult(dummy)
+
 # disconnect
 DBI::dbDisconnect(pgcon)
 
 # dump to SQL text
-system("pg_dump --dbname=odot_crash_data > odot_crash_data.sql")
+system("pg_dump --verbose --clean --if-exists --create --dbname=odot_crash_data > odot_crash_data.sql")
