@@ -1,12 +1,12 @@
 version: '3.4'
 services:
-  r-ver:
+  r-base:
     build:
-      context: r-ver
+      context: r-base
       dockerfile: Dockerfile
       args:
         - POSTGRES_PASSWORD
-    image: r-ver
+    image: r-base
   postgis:
     build:
       context: postgis

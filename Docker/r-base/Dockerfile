@@ -1,4 +1,4 @@
-FROM rocker/r-ver
+FROM rocker/r-base
 LABEL maintainer="M. Edward (Ed) Borasky <znmeb@znmeb.net>"
 
 # pick up "postgres" user's password for the "postgis" service
