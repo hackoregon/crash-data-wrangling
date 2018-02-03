@@ -1,11 +1,17 @@
 version: '3.4'
 services:
-  odot_crash_data:
+  rstudio:
     build:
       context: .
       dockerfile: Dockerfile
       args:
         - POSTGRES_PASSWORD
-    image: odot_crash_data
+    image: docker.io/znmeb/rstudio
+    ports:
+      - 7878:8787
+  postgis:
+    image: docker.io/znmeb/postgis
+    environment:
+      - POSTGRES_PASSWORD
     ports: 
       - 5439:5432

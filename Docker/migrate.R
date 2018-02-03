@@ -3,7 +3,7 @@ postgres_password <- readLines("POSTGRES_PASSWORD.txt")
 
 # Set environment variables
 Sys.setenv(
-  PGHOST = "localhost",
+  PGHOST = "postgis",
   PGPORT = 5432,
   PGUSER = "postgres",
   PGPASSWORD = postgres_password
