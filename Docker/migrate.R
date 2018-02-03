@@ -3,7 +3,7 @@ postgres_password <- readLines("POSTGRES_PASSWORD.txt")
 
 # Set environment variables
 Sys.setenv(
-  PGHOST = "postgis",
+  PGHOST = "localhost",
   PGPORT = 5432,
   PGUSER = "postgres",
   PGPASSWORD = postgres_password
@@ -23,7 +23,7 @@ get_mdb_table <- function(mdb_file, table_name) {
 
 get_postgresql_connection <- function(dbname) {
   return(DBI::dbConnect(
-    drv = RPostgres::Postgres(),
+    drv = RPostgreSQL::PostgreSQL(),
     dbname = dbname
   ))
 }
@@ -70,4 +70,4 @@ DBI::dbClearResult(dummy)
 DBI::dbDisconnect(pgcon)
 
 # dump to SQL text
-system("pg_dump --verbose --clean --if-exists --create --dbname=odot_crash_data > odot_crash_data.sql")
+system("pg_dump --verbose --clean --if-exists --dbname=odot_crash_data > odot_crash_data.sql")
