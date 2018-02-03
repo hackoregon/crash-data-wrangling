@@ -1,39 +1,40 @@
-FROM docker.io/rocker/rstudio
+FROM postgres:10
 LABEL maintainer="M. Edward (Ed) Borasky <znmeb@znmeb.net>"
+
+# Install PostGIS
+RUN apt-get update \
+  && apt-get install -qqy --no-install-recommends \
+  ca-certificates \
+  postgis \
+  postgresql-10-postgis-2.4 \
+  postgresql-10-postgis-2.4-scripts \
+  postgresql-10-postgis-scripts \
+  && apt-get clean
+
+# 'postgres' Linux home directory
+RUN mkdir -p /home/postgres
+RUN usermod --shell /bin/bash --home /home/postgres --move-home postgres
+
+# files in this directory run after the database is initialized and started
+RUN mkdir -p /docker-entrypoint-initdb.d/
 
 # pick up "postgres" user's password for the "postgis" service
 ARG POSTGRES_PASSWORD
 
-# command line / development conveniences
+# repo for recent R
+COPY R.list /etc/apt/sources.list.d/
+RUN apt-key adv --keyserver keys.gnupg.net --recv-key 'E19F5F87128899B192B1A2C2AD5F960A256A04AF'
 RUN apt-get update \
   && apt-get install -qqy --no-install-recommends \
-  apt-file \
-  gnupg \
-  man-db \
-  mlocate \
-  vim-nox \
-  && apt-get clean
-
-# PostgreSQL is from the PGDG repo so we need to get libpq-dev from there too!
-COPY pgdg.list /etc/apt/sources.list.d/
-RUN wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-RUN apt-get update \
-  && apt-get install -qqy --no-install-recommends \
-  mdbtools \
   libpq-dev \
-  postgresql-client-10 \
+  mdbtools \
+  r-base \
+  r-cran-hmisc \
+  r-cran-rpostgresql \
   && apt-get clean
-
-# update the databases
-RUN mandb
-RUN apt-file update
-RUN updatedb
-
-# R packages we need
-RUN R --no-save --no-restore -e "install.packages(c('Hmisc', 'RPostgres'), quiet = TRUE)"
 
 # Populate /home/rstudio
-COPY migrate.R /home/rstudio
-COPY odot_crash_data.mdb /home/rstudio/
-RUN echo ${POSTGRES_PASSWORD} > /home/rstudio/POSTGRES_PASSWORD.txt
-RUN chown -R rstudio:rstudio /home/rstudio
+COPY migrate.R /home/postgres
+COPY odot_crash_data.mdb /home/postgres/
+RUN echo ${POSTGRES_PASSWORD} > /home/postgres/POSTGRES_PASSWORD.txt
+RUN chown -R postgres:postgres /home/postgres
