@@ -47,6 +47,21 @@ for (table_name in tables) {
   DBI::dbWriteTable(pgcon, tolower(table_name), work, overwrite = TRUE)
 }
 
+# add geometry column
+dummy <- DBI::dbSendStatement(
+  pgcon,
+  "ALTER TABLE crash ADD COLUMN geom_4269 geometry;"
+)
+DBI::dbClearResult(dummy)
+update <- paste(
+  "UPDATE crash",
+  "SET geom_4269 = ST_SetSRID(ST_MakePoint(longtd_dd, lat_dd), 4269)",
+  "WHERE longtd_dd IS NOT NULL AND lat_dd IS NOT NULL;",
+  sep = " "
+)
+dummy <- DBI::dbSendStatement(pgcon, update)
+DBI::dbClearResult(dummy)
+
 # add primary keys
 dummy <- DBI::dbSendStatement(
   pgcon,
