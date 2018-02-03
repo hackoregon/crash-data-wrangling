@@ -39,6 +39,10 @@ DBI::dbDisconnect(pgcon)
 # reconnect to the new database
 pgcon <- get_postgresql_connection("odot_crash_data")
 
+# create PostGIS extension
+dummy <- DBI::dbSendStatement(pgcon, "CREATE EXTENSION postgis;")
+DBI::dbClearResult(dummy)
+
 # get list of tables from MDB file
 tables <- get_mdb_tables("odot_crash_data.mdb")
 for (table_name in tables) {
