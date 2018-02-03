@@ -1,16 +1,17 @@
 version: '3.4'
 services:
-  rstudio:
+  r-ver:
     build:
-      context: .
+      context: r-ver
       dockerfile: Dockerfile
       args:
         - POSTGRES_PASSWORD
-    image: docker.io/znmeb/rstudio
-    ports:
-      - 7878:8787
+    image: r-ver
   postgis:
-    image: docker.io/znmeb/postgis
+    build:
+      context: postgis
+      dockerfile: Dockerfile
+    image: postgis
     environment:
       - POSTGRES_PASSWORD
     ports: 
