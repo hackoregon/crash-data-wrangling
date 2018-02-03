@@ -7,6 +7,7 @@ ARG POSTGRES_PASSWORD
 RUN apt-get update \
   && apt-get install -qqy --no-install-recommends \
   mdbtools \
+  postgresql-client-10 \
   r-cran-dbi \
   r-cran-hmisc \
   r-cran-rpostgresql \
