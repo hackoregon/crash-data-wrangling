@@ -8,10 +8,12 @@
 6. Type `docker logs -f crashdatawrangling_r-base_1`. You'll see the migration script run. When it's done you'll see
 
     ```
-    pg_dump: creating CONSTRAINT "public.crash crash_pkey"
-    pg_dump: creating CONSTRAINT "public.partic partic_pkey"
-    pg_dump: creating CONSTRAINT "public.vhcl vhcl_pkey"
-    pg_dump: creating ACL "public"
+    pg_dump: dumping contents of table "public.vhcl"
+    pg_dump: dumping contents of table "public.vhcl_ownshp"
+    pg_dump: dumping contents of table "public.vhcl_typ"
+    pg_dump: dumping contents of table "public.vhcl_use"
+    pg_dump: dumping contents of table "public.wkday"
+    pg_dump: dumping contents of table "public.wthr_cond"
     > 
     ```
 7. Type `docker cp crashdatawrangling_r-base_1:/home/hacko/odot_crash_data.sql .` to copy the SQL dump file out of the container where it was created.
