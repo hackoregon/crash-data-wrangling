@@ -89,4 +89,4 @@ DBI::dbClearResult(dummy)
 DBI::dbDisconnect(pgcon)
 
 # dump to SQL text
-system("pg_dump --format=custom --verbose --clean --if-exists --dbname=odot_crash_data > odot_crash_data.pgdump")
+system("pg_dump --format=custom --verbose --clean --if-exists --dbname=odot_crash_data > odot_crash_data.backup")
