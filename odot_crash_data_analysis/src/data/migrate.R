@@ -1,17 +1,12 @@
-# set some variables
-source("Rprofile.site")
-
-# install the packages we need
-install.packages(c("Hmisc", "RPostgres"), quiet = TRUE)
-
-# point to the raw data file
-raw_data <- "../../data/raw/Portland_Fatal___Injury_Crashes_2004-2014_Decode.mdb"
+# read password for "postgres" database user
+postgres_password <- readLines("POSTGRES_PASSWORD.txt")
 
 # Set environment variables
 Sys.setenv(
   PGHOST = "postgis",
   PGPORT = 5432,
-  PGUSER = "dbsuper",
+  PGUSER = "postgres",
+  PGPASSWORD = postgres_password
 )
 
 # define functions
@@ -45,10 +40,10 @@ DBI::dbDisconnect(pgcon)
 pgcon <- get_postgresql_connection("odot_crash_data")
 
 # get list of tables from MDB file
-tables <- get_mdb_tables(raw_data)
+tables <- get_mdb_tables("odot_crash_data.mdb")
 for (table_name in tables) {
   cat("\nMigrating table", table_name, "\n")
-  work <- get_mdb_table(raw_data, table_name)
+  work <- get_mdb_table("odot_crash_data.mdb", table_name)
   DBI::dbWriteTable(pgcon, tolower(table_name), work, overwrite = TRUE)
 }
 
@@ -71,33 +66,8 @@ dummy <- DBI::dbSendStatement(
 )
 DBI::dbClearResult(dummy)
 
-dummy <- DBI::dbSendStatement(
-  pgcon,
-  "CREATE USER IF NOT EXISTS "transportation-systems";"
-)
-DBI::dbClearResult(dummy)
-
-dummy <- DBI::dbSendStatement(
-  pgcon,
-  "ALTER DATABASE odot_crash_data OWNER TO "transportation-systems";"
-)
-DBI::dbClearResult(dummy)
-
-dummy <- DBI::dbSendStatement(
-  pgcon,
-  "REASSIGN OWNED BY CURRENT USER TO "transportation-systems";"
-)
-DBI::dbClearResult(dummy)
-
 # disconnect
 DBI::dbDisconnect(pgcon)
 
-# create backups
+# dump to SQL text
 system("pg_dump --verbose --clean --if-exists --create --dbname=odot_crash_data > odot_crash_data.sql")
-plain <- paste(
-  "pg_dump --format=p --verbose --clean --create --if-exists --dbname=odot_crash_data",
-  "gzip -c > /home/dbsuper/Backups/odot_crash_data.sql.gz", sep = " | ")
-system(plain)
-
-custom <- "pg_dump --format=c --verbose --dbname=odot_crash_data > /home/dbsuper/Backups/odot_crash_data.backup"
-system(custom)
