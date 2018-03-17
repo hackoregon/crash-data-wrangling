@@ -9,7 +9,7 @@ raw_data <- "../../data/raw/Portland_Fatal___Injury_Crashes_2004-2014_Decode.mdb
 
 # Set environment variables
 Sys.setenv(
-  PGHOST = "/var/run/postgresql",
+  PGHOST = "postgis",
   PGPORT = 5432,
   PGUSER = "dbsuper",
 )
@@ -71,7 +71,6 @@ dummy <- DBI::dbSendStatement(
 )
 DBI::dbClearResult(dummy)
 
-# change ownership!
 dummy <- DBI::dbSendStatement(
   pgcon,
   "CREATE USER IF NOT EXISTS "transportation-systems";"
@@ -94,6 +93,7 @@ DBI::dbClearResult(dummy)
 DBI::dbDisconnect(pgcon)
 
 # create backups
+system("pg_dump --verbose --clean --if-exists --create --dbname=odot_crash_data > odot_crash_data.sql")
 plain <- paste(
   "pg_dump --format=p --verbose --clean --create --if-exists --dbname=odot_crash_data",
   "gzip -c > /home/dbsuper/Backups/odot_crash_data.sql.gz", sep = " | ")
