@@ -5,7 +5,7 @@ source("Rprofile.site")
 install.packages(c("Hmisc", "RPostgres"), quiet = TRUE)
 
 # point to the raw data file
-raw_data <- "../../data/raw/Portland_Fatal___Injury_Crashes_2004-2014_Decode.mdb"
+raw_data <- "/home/dbsuper/Raw/Portland_Fatal___Injury_Crashes_2004-2014_Decode.mdb"
 
 # Set environment variables
 Sys.setenv(
