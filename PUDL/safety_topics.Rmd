@@ -1,0 +1,55 @@
+---
+title: "PUDL Safety Hotlines Topic Model"
+output: html_notebook
+---
+
+## Load libraries
+```{r}
+library("tidytext")
+library("dplyr")
+library("magrittr")
+library("readr")
+library("topicmodels")
+data("stop_words")
+```
+
+## Read the data file
+```{r}
+Safety_Hotline_Tickets <- read_csv(
+  "~/Safety_Hotline_Tickets.csv", col_types = cols(
+    Date_Created = col_date(format = "%Y-%m-%d"),
+    Item_ID = col_character()))
+```
+
+## Word counts
+```{r}
+raw_words <- Safety_Hotline_Tickets %>% 
+  select(Item_ID, Description) %>% 
+  unnest_tokens(word, Description) %>% 
+  anti_join(stop_words)
+```
+
+## Term frequency - inverse document frequency
+```{r}
+line_words <- raw_words %>% 
+  count(Item_ID, word, sort = TRUE) %>% 
+  ungroup()
+total_words <- line_words %>% 
+  group_by(Item_ID) %>% 
+  summarize(total = sum(n))
+line_words %<>% left_join(total_words) %>% 
+  bind_tf_idf(word, Item_ID, n)
+safety_dtm <- line_words %>% 
+  cast_dtm(Item_ID, word, n)
+```
+
+## Latent Dirichlet analysis / topic model
+```{r}
+safety_lda <- LDA(safety_dtm, k = 5, control = list(seed = 1234))
+safety_topics <- tidy(safety_lda, matrix = "beta")
+top_terms <- safety_topics %>%
+  group_by(topic) %>%
+  top_n(5, beta) %>%
+  ungroup() %>%
+  arrange(topic, -beta)
+```
