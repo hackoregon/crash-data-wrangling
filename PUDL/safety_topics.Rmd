@@ -1,16 +1,18 @@
 ---
 title: "PUDL Safety Hotlines Topic Model"
 output: html_notebook
+bibliography: Text_Mining_with_R.bibtex
 ---
 
 ## Load libraries
 ```{r}
+if (!require("tidytext")) install.packages("tidytext")
+if (!require("topicmodels")) install.packages("topicmodels")
+library("readr")
 library("tidytext")
 library("dplyr")
 library("magrittr")
-library("readr")
 library("topicmodels")
-data("stop_words")
 ```
 
 ## Read the data file
@@ -23,10 +25,13 @@ Safety_Hotline_Tickets <- read_csv(
 
 ## Word counts
 ```{r}
+data("stop_words")
+write_csv(stop_words, path = "stop_words.csv")
 raw_words <- Safety_Hotline_Tickets %>% 
   select(Item_ID, Description) %>% 
   unnest_tokens(word, Description) %>% 
-  anti_join(stop_words)
+  anti_join(stop_words) %>% 
+  write_csv(path = "raw_words.csv")
 ```
 
 ## Term frequency - inverse document frequency
@@ -36,9 +41,11 @@ line_words <- raw_words %>%
   ungroup()
 total_words <- line_words %>% 
   group_by(Item_ID) %>% 
-  summarize(total = sum(n))
+  summarize(total = sum(n)) %>% 
+  write_csv(path = "total_words.csv")
 line_words %<>% left_join(total_words) %>% 
-  bind_tf_idf(word, Item_ID, n)
+  bind_tf_idf(word, Item_ID, n) %>% 
+  write_csv(path = "line_words.csv")
 safety_dtm <- line_words %>% 
   cast_dtm(Item_ID, word, n)
 ```
@@ -46,10 +53,14 @@ safety_dtm <- line_words %>%
 ## Latent Dirichlet analysis / topic model
 ```{r}
 safety_lda <- LDA(safety_dtm, k = 5, control = list(seed = 1234))
-safety_topics <- tidy(safety_lda, matrix = "beta")
+safety_topics <- tidy(safety_lda, matrix = "beta") %>% 
+  write_csv(path = "safety_topics.csv")
 top_terms <- safety_topics %>%
   group_by(topic) %>%
   top_n(5, beta) %>%
   ungroup() %>%
-  arrange(topic, -beta)
+  arrange(topic, -beta) %>% 
+  write_csv(path = "top_terms.csv")
 ```
+
+## References
