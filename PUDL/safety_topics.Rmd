@@ -23,7 +23,7 @@ Safety_Hotline_Tickets <- read_csv(
     Item_ID = col_character()))
 ```
 
-## Word counts
+## Word counts [@silge2017text, chapter 1]
 ```{r}
 data("stop_words")
 write_csv(stop_words, path = "stop_words.csv")
@@ -34,7 +34,7 @@ raw_words <- Safety_Hotline_Tickets %>%
   write_csv(path = "raw_words.csv")
 ```
 
-## Term frequency - inverse document frequency
+## Term frequency - inverse document frequency [@silge2017text, chapter 3]
 ```{r}
 line_words <- raw_words %>% 
   count(Item_ID, word, sort = TRUE) %>% 
@@ -50,7 +50,7 @@ safety_dtm <- line_words %>%
   cast_dtm(Item_ID, word, n)
 ```
 
-## Latent Dirichlet analysis / topic model
+## Latent Dirichlet analysis / topic model [@silge2017text, chapter 6]
 ```{r}
 safety_lda <- LDA(safety_dtm, k = 5, control = list(seed = 1234))
 safety_topics <- tidy(safety_lda, matrix = "beta") %>% 
