@@ -71,12 +71,7 @@ word_counts %>%
 ```
 
 ## Creating the document-term matrix [@silge2017text, chapter 3]
-The document-term matrix is the fundamental representation of a corpus of documents. In this case the documents are the issue descriptions as noted above.
-
-After this process runs, we have three artifacts:
-* total_words: a data frame with the total number of words in each document
-* line_words: a data frame with the values needed to construct the document-term matrix
-* safety_dtm: the document-term matrix
+The document-term matrix is the fundamental representation of a corpus of documents. In this case the documents are the issue descriptions as noted above. This step has no visualizations; it's only here to provide a document-term matrix `safety_dtm` for the topic model.
 
 ```{r}
 line_words <- raw_words %>% 
@@ -93,14 +88,12 @@ safety_dtm <- line_words %>%
 
 ## Latent Dirichlet analysis / topic model [@silge2017text, chapter 6]
 The final step is a latent Dirichlet analysis to determine the topics. This is a kind of unsupervised learning / clustering operation. We don't know going in how many topics there will be - we have to start with a small number and use our insights about the subject matter to tell us when to stop.
-
-I'm going to invoke the "Rule of Three" - when in doubt, assume there are only three options. 
 ```{r}
 safety_lda <- LDA(safety_dtm, k = 5, control = list(seed = 1234))
 safety_topics <- tidy(safety_lda, matrix = "beta")
 top_terms <- safety_topics %>%
   group_by(topic) %>%
-  top_n(5, beta) %>%
+  top_n(10, beta) %>%
   ungroup() %>%
   arrange(topic, -beta) %>% 
   write_csv(path = "top_terms.csv")
