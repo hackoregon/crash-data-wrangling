@@ -54,8 +54,7 @@ pdx_stop_words <- tribble(
 raw_words <- Safety_Hotline_Tickets %>% 
   select(Item_ID, Description) %>% 
   unnest_tokens(word, Description) %>% 
-  anti_join(pdx_stop_words) %>% 
-  write_csv(path = "raw_words.csv")
+  anti_join(pdx_stop_words)
 ```
 
 ## Creating the document-term matrix [@silge2017text, chapter 3]
@@ -72,11 +71,9 @@ line_words <- raw_words %>%
   ungroup()
 total_words <- line_words %>% 
   group_by(Item_ID) %>% 
-  summarize(total = sum(n)) %>% 
-  write_csv(path = "total_words.csv")
+  summarize(total = sum(n))
 line_words %<>% left_join(total_words) %>% 
-  bind_tf_idf(word, Item_ID, n) %>% 
-  write_csv(path = "line_words.csv")
+  bind_tf_idf(word, Item_ID, n)
 safety_dtm <- line_words %>% 
   cast_dtm(Item_ID, word, n)
 ```
@@ -87,8 +84,7 @@ The final step is a latent Dirichlet analysis to determine the topics. This is a
 I'm going to invoke the "Rule of Three" - when in doubt, assume there are only three options. 
 ```{r}
 safety_lda <- LDA(safety_dtm, k = 5, control = list(seed = 1234))
-safety_topics <- tidy(safety_lda, matrix = "beta") %>% 
-  write_csv(path = "safety_topics.csv")
+safety_topics <- tidy(safety_lda, matrix = "beta")
 top_terms <- safety_topics %>%
   group_by(topic) %>%
   top_n(5, beta) %>%
