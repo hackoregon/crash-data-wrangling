@@ -31,15 +31,30 @@ Safety_Hotline_Tickets <- read_csv(
 ```
 
 ## Extracting the words from the documents [@silge2017text, chapter 1]
-The first step is to create a data frame, called "raw_words", that contains one row for each word that occurs in any description. Once we have that, we remove "stop words". Stop words are words that are considered noise. We use the default English stop words from the TidyText package. 
+The first step is to create a data frame, called "raw_words", that contains one row for each word that occurs in any description. Once we have that, we remove "stop words". Stop words are words that are considered noise. We use the default English stop words from the TidyText package, augmented with a dataset-specific set.
+
+In looking at the data, I found that Portland areas "NW", "NE", etc., occurred frequently. Since the dataset includes both a text definition of the location and GIS coordinates, these designators add no value and should be considered stop words.
 
 ```{r}
+# Load the TidyText default stop words
 data("stop_words")
-write_csv(stop_words, path = "stop_words.csv")
+
+# add our own stop words and save
+pdx_stop_words <- tribble(
+  ~word, ~lexicon,
+  "n", "pdx_stop_words",
+  "ne", "pdx_stop_words",
+  "se", "pdx_stop_words",
+  "sw", "pdx_stop_words",
+  "nw", "pdx_stop_words"
+) %>% 
+  bind_rows(stop_words) %>% 
+  write_csv(path = "pdx_stop_words.csv")
+
 raw_words <- Safety_Hotline_Tickets %>% 
   select(Item_ID, Description) %>% 
   unnest_tokens(word, Description) %>% 
-  anti_join(stop_words) %>% 
+  anti_join(pdx_stop_words) %>% 
   write_csv(path = "raw_words.csv")
 ```
 

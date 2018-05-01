@@ -1,4 +1,9 @@
 word,lexicon
+n,pdx_stop_words
+ne,pdx_stop_words
+se,pdx_stop_words
+sw,pdx_stop_words
+nw,pdx_stop_words
 a,SMART
 a's,SMART
 able,SMART
