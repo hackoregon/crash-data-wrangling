@@ -4,7 +4,7 @@ output: html_notebook
 bibliography: Text_Mining_with_R.bibtex
 ---
 
-## Load libraries
+## Loading the libraries
 ```{r}
 if (!require("tidytext")) install.packages("tidytext")
 if (!require("topicmodels")) install.packages("topicmodels")
@@ -15,7 +15,14 @@ library("magrittr")
 library("topicmodels")
 ```
 
-## Read the data file
+## Reading the data file
+The safety hotline tickets dataset is a single CSV file with the following columns:
+* Item_ID: A unique identifier for the entry
+* Date_Created: the date in "yyyy-mm-dd" format,
+* Description: the description of the issue. This is the text we will be mining; each of these will be a document
+* Problem_Location: a street address or intersection
+*X, Y, Longitude, Latitude: GIS coordinates
+
 ```{r}
 Safety_Hotline_Tickets <- read_csv(
   "~/Safety_Hotline_Tickets.csv", col_types = cols(
@@ -23,7 +30,9 @@ Safety_Hotline_Tickets <- read_csv(
     Item_ID = col_character()))
 ```
 
-## Word counts [@silge2017text, chapter 1]
+## Extracting the words from the documents [@silge2017text, chapter 1]
+The first step is to create a data frame, called "raw_words", that contains one row for each word that occurs in any description. Once we have that, we remove "stop words". Stop words are words that are considered noise. We use the default English stop words from the TidyText package. 
+
 ```{r}
 data("stop_words")
 write_csv(stop_words, path = "stop_words.csv")
@@ -34,7 +43,14 @@ raw_words <- Safety_Hotline_Tickets %>%
   write_csv(path = "raw_words.csv")
 ```
 
-## Term frequency - inverse document frequency [@silge2017text, chapter 3]
+## Creating the document-term matrix [@silge2017text, chapter 3]
+The document-term matrix is the fundamental representation of a corpus of documents. In this case the documents are the issue descriptions as noted above.
+
+After this process runs, we have three artifacts:
+* total_words: a data frame with the total number of words in each document
+* line_words: a data frame with the values needed to construct the document-term matrix
+* safety_dtm: the document-term matrix
+
 ```{r}
 line_words <- raw_words %>% 
   count(Item_ID, word, sort = TRUE) %>% 
@@ -51,6 +67,9 @@ safety_dtm <- line_words %>%
 ```
 
 ## Latent Dirichlet analysis / topic model [@silge2017text, chapter 6]
+The final step is a latent Dirichlet analysis to determine the topics. This is a kind of unsupervised learning / clustering operation. We don't know going in how many topics there will be - we have to start with a small number and use our insights about the subject matter to tell us when to stop.
+
+I'm going to invoke the "Rule of Three" - when in doubt, assume there are only three options. 
 ```{r}
 safety_lda <- LDA(safety_dtm, k = 5, control = list(seed = 1234))
 safety_topics <- tidy(safety_lda, matrix = "beta") %>% 
