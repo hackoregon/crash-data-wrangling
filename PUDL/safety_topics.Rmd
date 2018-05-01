@@ -13,6 +13,7 @@ library("tidytext")
 library("dplyr")
 library("magrittr")
 library("topicmodels")
+library("ggplot2")
 ```
 
 ## Reading the data file
@@ -55,6 +56,18 @@ raw_words <- Safety_Hotline_Tickets %>%
   select(Item_ID, Description) %>% 
   unnest_tokens(word, Description) %>% 
   anti_join(pdx_stop_words)
+```
+## Visualizing the most common words [@silge2017text, chapter 1]
+```{r}
+word_counts <- raw_words %>%
+  count(word, sort = TRUE) %>% 
+  mutate(word = reorder(word, n))
+word_counts %>% 
+  top_n(15) %>% 
+  ggplot(aes(word, n)) +
+    geom_col() +
+    xlab(NULL) +
+    coord_flip()
 ```
 
 ## Creating the document-term matrix [@silge2017text, chapter 3]
